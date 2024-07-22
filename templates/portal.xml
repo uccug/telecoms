@@ -1,0 +1,522 @@
+<odoo>
+    <template id="portal_my_home_telecoms_menu" name="Telecoms" inherit_id="portal.portal_my_home">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <a class="list-group-item" data-toggle="collapse" data-target="#telecoms-menu" aria-expanded="false" aria-controls="telecoms-menu">
+                Telecoms
+            </a>
+            <div class="collapse" id="telecoms-menu">
+                <t t-call="portal.portal_docs_entry">
+                    <t t-set="title">Licenses</t>
+                    <t t-set="url" t-value="'/my/telecom/licenses'"/>
+                    <t t-set="count" t-value="0"/>
+                </t>
+                
+                <t t-call="portal.portal_docs_entry">
+                    <t t-set="title">Authorizations</t>
+                    <t t-set="url" t-value="'/my/telecom/authorizations'"/>
+                    <t t-set="count" t-value="0"/>
+                </t>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="portal_telecom_licenses_list" name="Telecommunications License Applications">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Telecommunications License Applications</t>
+            </t>
+
+            <div>
+                <a href="/telecoms/licenses/apply" class="btn btn-primary pull-right">Apply for Telecom License</a>
+            </div>
+
+            <t t-if="not applications">
+                <div class="bg-light text-center">There are currently no Telecommunications Licenses attached to your account.</div>
+            </t>
+
+
+            
+            <t t-if="applications" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>#</th>
+                        <th>Company Name</th>
+                        <th>License Type</th>
+                        <th>State</th>
+                        <th>Create Date</th>
+                        <th>Submission Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="applications" t-as="application">
+                        <tr class='clickable-row' t-attf-data-href="/my/telecoms/licenses/edit/#{application.id}?{{ keep_query() }}">
+                            <td>
+                                <t t-if="application.state == 'draft'">
+                                    <a t-attf-href="/my/telecoms/licenses/edit/#{application.id}?{{ keep_query() }}"><span t-field="application.id"/></a>
+                                </t>
+                                <t t-else="">
+                                    <a t-attf-href="/my/telecoms/licenses/#{application.id}?{{ keep_query() }}"><span t-field="application.id"/></a>
+                                </t>
+                            </td>
+                            <td><t t-esc="application.company_name"/></td>
+                            <td><t t-esc="application.license_type"/></td>
+                            <td><span t-field="application.state" class="badge badge-pill badge-info"/></td>
+                            <td><t t-esc="application.create_date"/></td>
+                            <td><t t-esc="application.submission_date"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="portal_telecom_authorizations_list" name="Telecommunications Authorizations">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Telecommunications License Applications</t>
+            </t>
+
+
+            <a href="/telecoms/licenses/apply" class="btn btn-primary pull-right">Apply for Telecom License</a>
+
+
+            <t t-if="not applications">
+                <p>There are currently no Telecommunications Licenses attached to your account.</p>
+            </t>
+
+
+            
+            <t t-if="applications" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>#</th>
+                        <th>Company Name</th>
+                        <th>License Type</th>
+                        <th>State</th>
+                        <th>Create Date</th>
+                        <th>Submission Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="applications" t-as="application">
+                        <tr class='clickable-row' t-attf-data-href="/my/telecoms/licenses/edit/#{application.id}?{{ keep_query() }}">
+                            <td>
+                                <t t-if="application.state == 'draft'">
+                                    <a t-attf-href="/my/telecoms/licenses/edit/#{application.id}?{{ keep_query() }}"><span t-field="application.id"/></a>
+                                </t>
+                                <t t-else="">
+                                    <a t-attf-href="/my/telecoms/licenses/#{application.id}?{{ keep_query() }}"><span t-field="application.id"/></a>
+                                </t>
+                            </td>
+                            <td><t t-esc="application.company_name"/></td>
+                            <td><t t-esc="application.license_type"/></td>
+                            <td><span t-field="application.state" class="badge badge-pill badge-info"/></td>
+                            <td><t t-esc="application.create_date"/></td>
+                            <td><t t-esc="application.submission_date"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <template id="portal_telecom_license_application_form" name="Telecommunications License Application Form">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title" t-if="application and application.state !='draft'">Application Details</t>
+                <t t-set="title" t-else="">Telecommunications License</t>
+            </t>
+
+            <div>
+                <h3 t-if="application and application.state !='draft'">Application Details</h3>
+                <h3 t-else="">Telecommunications License</h3>
+            </div>
+
+            <br/>
+
+            <div>
+                
+
+                <div class="card_body">
+                    <form action="" method="post" enctype="multipart/form-data" class="form" id="application-form">
+                        
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                        <section class="fieldset">
+                            <h1>License Details</h1>
+                            
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label>Application Type</label>
+                                    <p t-if="application and application.state !='draft'"><t t-esc="application.application_type"/></p>
+                                    
+                                    <input type="hidden" id="_application_type" t-att-value="application.application_type if application else None"/>
+                                    
+                                    <select class="form-control" name="application_type" id="application-type" t-att-hidden="'true' if application and application.state !='draft' else None">
+                                        <option value="new">New</option>
+                                        <option value="renewal">Renewal</option>
+                                        <option value="transfer">Transfer</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-sm-6">
+                                    <label>License Type</label>
+                                    
+                                    <p t-if="application and application.state !='draft'"><t t-esc="application.license_type"/></p>
+
+                                    <input type="hidden" id="_license_type" t-att-value="application.license_type if application else None"/>
+
+                                    <select class="form-control" name="license_type" id="service-category" t-att-hidden="'true' if application and application.state !='draft' else None">
+                                        <option value="NTO">National Telecommunications Operator</option>
+                                        <option value="NPIP">National Public Infrastructure Provider</option>
+                                        <option value="NPSP">National Public Service Provider</option>
+                                        <option value="RPIP">Regional Public Infrastructure Provider</option>
+                                        <option value="RPSP">Regional Public Service Provider</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <br/>
+
+                        <section class="fieldset">
+                            <h1>Applicant Details</h1>
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label>Company Name</label>
+                                    <input type="text" class="form-control" name="company_name" required="true" t-if="application and application.state == 'draft'" t-att-value="application.company_name"/>
+                                    <p t-if="application and application.state !='draft'"><t t-esc="application.company_name"/></p>
+                                    <input type="text" class="form-control" name="company_name" required="true" t-if="not application"/>
+                                </div>
+
+                                <div class="form-group col-sm-6">
+                                    <label>Physical Address</label>
+                                    <input type="text" class="form-control" name="company_physical_address" t-if="application and application.state == 'draft'" t-att-value="application.company_physical_address"/>
+                                    <p t-if="application and application.state !='draft'"><t t-esc="application.company_physical_address"/></p>
+                                    <input type="text" class="form-control" name="company_physical_address" t-if="not application"/>
+                                </div>   
+
+                                <div class="form-group col-sm-6">
+                                    <label>Postal Address</label>
+                                    <input type="text" class="form-control" name="company_postal_address" t-if="application and application.state == 'draft'" t-att-value="application.company_postal_address"/>
+                                    <p t-if="application and application.state !='draft'"><t t-esc="application.company_postal_address"/></p>
+                                    <input type="text" class="form-control" name="company_postal_address" t-if="not application"/>
+                                </div>
+
+                                <div class="form-group col-sm-6">
+                                    <label>Telephone Number</label>
+                                    <input type="text" class="form-control" name="company_tel" t-if="application and application.state == 'draft'" t-att-value="application.company_tel"/>
+                                    <p t-if="application and application.state !='draft'"><t t-esc="application.company_tel"/></p>
+                                    <input type="text" class="form-control" name="company_tel" t-if="not application"/>
+                                </div>
+
+                                <div class="form-group col-sm-6">
+                                    <label>Company Email address</label>
+                                    <input type="text" class="form-control" name="company_email" t-if="application and application.state == 'draft'" t-att-value="application.company_email"/>
+                                    <p t-if="application and application.state !='draft'"><t t-esc="application.company_email"/></p>
+                                    <input type="text" class="form-control" name="company_email" t-if="not application"/>
+                                </div>
+
+                                <div class="form-group col-sm-6">
+                                    <label>Tax Identification Number</label>
+                                    <input type="text" class="form-control" name="company_tin" required="true" t-if="application and application.state == 'draft'" t-att-value="application.company_tin"/>
+                                    <p t-if="application and application.state !='draft'"><t t-esc="application.company_tin"/></p>
+                                    <input type="text" class="form-control" name="company_tin" required="true" t-if="not application"/>
+                                </div>    
+
+                                <div class="form-group col-sm-6">
+                                <label id="document-label">Certification of Incorporation</label>
+                                <p t-if="application">
+                                    <a target="_blank" t-if="application.certificate_of_incorporation" t-attf-href="#">
+                                        <t t-esc="application.certificate_of_incorporation_filename" t-if="application.certificate_of_incorporation_filename"/>
+                                        <t t-else="">Certification of Incorporation</t>
+                                    </a>
+                                </p>
+                                <input type="file" class="form-control-file" name="certificate_of_incorporation" t-att-hidden="'true' if application and application.state !='draft' else None" t-att-required="None if application and application.certificate_of_incorporation else 'true'"/>
+                            </div> 
+
+                            <div class="form-group col-sm-6">
+                                <label id="document-label">Memorandum and Articles of Association</label>
+                                <p t-if="application">
+                                    <a target="_blank" t-if="application.mem_arts" t-attf-href="#">
+                                        <t t-esc="application.mem_arts_filename" t-if="application.mem_arts_filename"/>
+                                        <t t-else="">Memorandum and Articles of Association</t>
+                                    </a>
+                                </p>
+                                <input type="file" class="form-control-file" name="mem_arts" t-att-hidden="'true' if application and application.state !='draft' else None" t-att-required="None if application and application.mem_arts else 'true'"/>
+                            </div>                                                     
+
+                            </div>                   
+                        </section>    
+
+                        <br/>                    
+                        
+                        <section class="fieldset">
+                            <h1>Contact Person</h1>
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label>Name</label>
+                                    <input type="text" class="form-control" name="contact_person_name" required="true" t-if="application and application.state == 'draft'" t-att-value="application.contact_person_name"/>
+                                    <p t-if="application and application.state !='draft'"><t t-esc="application.contact_person_name"/></p>
+                                    <input type="text" class="form-control" name="contact_person_name" required="true" t-if="not application"/>
+                                </div>  
+                                <div class="form-group col-sm-6">
+                                    <label>Email</label>
+                                    <input type="email" class="form-control" name="contact_person_email" required="true" t-if="application and application.state == 'draft'" t-att-value="application.contact_person_email"/>
+                                    <p t-if="application and application.state !='draft'"><t t-esc="application.contact_person_email"/></p>
+                                    <input type="email" class="form-control" name="contact_person_email" required="true" t-if="not application"/>
+                                </div>  
+                                <div class="form-group col-sm-6">
+                                    <label>Phone Number</label>
+                                    <input type="text" class="form-control" name="contact_person_number" required="true" t-if="application and application.state == 'draft'" t-att-value="application.contact_person_number"/>
+                                    <p t-if="application and application.state !='draft'"><t t-esc="application.contact_person_number"/></p>
+                                    <input type="text" class="form-control" name="contact_person_number" required="true" t-if="not application"/>
+                                </div>                                                                                  
+                            </div>
+                        </section>
+
+                        <br/>
+
+                        <section class="fieldset">
+                            <h1>Company Directors</h1>
+                            <table class="table table-stripped" id="directorsTable">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Citizenship</th>
+                                    <th>ID/Passport Number</th>
+                                    <th>Copy of ID</th>
+                                    <t t-if="application and application.state == 'draft' and application.company_directors">
+                                        <th>Action</th>
+                                    </t>
+                                </tr>
+                                
+                                <t t-if="application">
+                                    <t t-if="application.company_directors" t-foreach="application.company_directors" t-as="director">
+                                        <tr>
+                                            <td><t t-esc="director.name"/></td>
+                                            <td><t t-esc="director.citizenship"/></td>
+                                            <td><t t-esc="director.id_number"/></td>
+                                            <td><a href="#"><t t-esc="director.id_file_name"/></a></td>
+                                            <td t-if="application.state == 'draft'"><a href="#">Delete</a></td>
+                                        </tr>
+                                    </t>
+                                </t>
+
+                                <t t-else="">
+                                    <tr>
+                                        <td><input type="text" name="directors_name"/></td>
+                                        <td><input type="text" name="directors_citizenship"/></td>
+                                        <td><input type="text" name="directors_id_number"/></td>
+                                        <td><input type="file" name="directors_id_file" accept="image/*,.pdf"/></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><input type="text" name="directors_name"/></td>
+                                        <td><input type="text" name="directors_citizenship"/></td>
+                                        <td><input type="text" name="directors_id_number"/></td>
+                                        <td><input type="file" name="directors_id_file" accept="image/*,.pdf"/></td>
+                                    </tr> 
+                                    <tr>
+                                        <td><input type="text" name="directors_name"/></td>
+                                        <td><input type="text" name="directors_citizenship"/></td>
+                                        <td><input type="text" name="directors_id_number"/></td>
+                                        <td><input type="file" name="directors_id_file" accept="image/*,.pdf"/></td>
+                                    </tr>
+                                </t>                                            
+                            </table>
+                            <button class="btn" style="margin: 10px;" id="addDirector" t-att-hidden="'true' if application and application.state !='draft' else None">Add Another Director</button>                        
+                        </section>
+
+                        <br/>
+
+
+                        <section class="fieldset">
+                            <h1>Key Staff (Management Responsibility)</h1>
+                            <table class="table table-stripped" id="staffTable">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Job Title</th>
+                                    <th>Resume/CV</th>
+                                    <t t-if="application">
+                                        <th t-if="application.key_staff">Action</th>
+                                    </t>
+                                </tr>
+                                <t t-if="application">
+                                    <t t-if="application.key_staff" t-foreach="application.key_staff" t-as="staff">
+                                        <tr>
+                                            <td><t t-esc="staff.name"/></td>
+                                            <td><t t-esc="staff.job_title"/></td>
+                                            <td><t t-esc="staff.cv_file_name"/></td>
+                                            <td><a href="#">Delete</a></td>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <tr>
+                                        <td><input type="text" name="staff_name"/></td>
+                                        <td><input type="text" name="staff_job_title"/></td>
+                                        <td><input type="file" name="staff_cv_file"/></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><input type="text" name="staff_name"/></td>
+                                        <td><input type="text" name="staff_job_title"/></td>
+                                        <td><input type="file" name="staff_cv_file"/></td>
+                                    </tr> 
+                                    <tr>
+                                        <td><input type="text" name="staff_name"/></td>
+                                        <td><input type="text" name="staff_job_title"/></td>
+                                        <td><input type="file" name="staff_cv_file"/></td>
+                                    </tr> 
+                                </t>                                           
+                            </table>
+                            <button class="btn" style="margin: 10px;" id="addStaff" t-att-hidden="'true' if application and application.state !='draft' else None">Add Another Key Staff Member</button>                        
+                        </section>
+
+                        <br/>
+
+                        <section class="fieldset">
+                            <h1>The Business plan</h1>
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label>Executive summary of the company</label>
+                                    <p t-if="application">
+                                        Currently: 
+                                        <a target="_blank" t-if="application.executive_summary" t-attf-href="/my/telecoms/licenses/#{application.id}/download/executive_summary">
+                                            <t t-esc="application.executive_summary_filename" t-if="application.executive_summary_filename"/>
+                                            <t t-else="">Executive Summary</t>
+                                        </a>
+                                    </p>
+                                    <input type="file" class="form-control-file" name="executive_summary" t-att-hidden="'true' if application and application.state !='draft' else None" t-att-required="None if application and application.executive_summary else 'true'"/>
+                                </div>
+
+                            </div>
+
+                        </section>
+
+                        <br/>
+
+                        <section class="fieldset">
+                            <h1>Financial status</h1>
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label>Tax clearance certificate</label>
+                                    <p t-if="application">
+                                        <a target="_blank" t-if="application.tax_clearance_certificate" t-attf-href="#">
+                                            <t t-esc="application.tax_clearance_certificate_filename" t-if="application.tax_clearance_certificate_filename"/>
+                                            <t t-else="">Tax clearance certificate</t>
+                                        </a>
+                                    </p>
+                                    <input type="file" class='form-control-file' name="tax_clearance_certificate" t-att-hidden="'true' if application and application.state !='draft' else None" t-att-required="None if application and application.tax_clearance_certificate else 'true'"/>
+                                </div>
+
+                                <div class="form-group col-sm-6">
+                                    <label>Loans (If any) certified financial statements and accounts for the last 3 years prior to application) (iv) Bankers and Financial References Name and address of bankers/financiers (including telephone and fax)</label>
+                                    <p t-if="application">
+                                        <a target="_blank" t-if="application.financial_statements" t-attf-href="#">
+                                            <t t-esc="application.financial_statements_filename" t-if="application.financial_statements_filename"/>
+                                            <t t-else="">Financial Statements</t>
+                                        </a>
+                                    </p>
+                                    <input type="file" class='form-control-file' name="financial_statements" t-att-hidden="'true' if application and application.state !='draft' else None" t-att-required="None if application and application.financial_statements else 'true'"/>
+                                </div>
+
+                                <div class="form-group col-sm-6">
+                                    <label> Sources of Funding for the proposed project (Ugx/ $.000)</label>
+                                    <p t-if="application">
+                                        <a target="_blank" t-if="application.source_of_funding" t-attf-href="#">
+                                            <t t-esc="application.source_of_funding_filename" t-if="application.source_of_funding_filename"/>
+                                            <t t-else="">Source of Funding</t>
+                                        </a>
+                                    </p>
+                                    <input type="file" class='form-control-file' name="source_of_funding" t-att-hidden="'true' if application and application.state !='draft' else None" t-att-required="None if application and application.source_of_funding else 'true'"/>
+                                </div>
+
+                                <div class="form-group col-sm-6">
+                                    <label>Revenue projections for at least 2 years</label>
+                                    <p t-if="application">
+                                        <a target="_blank" t-if="application.revenue_projections" t-attf-href="#">
+                                            <t t-esc="application.revenue_projections_filename" t-if="application.revenue_projections_filename"/>
+                                            <t t-else="">Revenue Projections</t>
+                                        </a>
+                                    </p>
+                                    <input type="file" class='form-control-file' name="revenue_projections" t-att-hidden="'true' if application and application.state !='draft' else None" t-att-required="None if application and application.revenue_projections else 'true'"/>
+                                </div>
+                            </div>
+
+                        </section>
+
+                        <br/>
+
+                        <div class="row">
+                            <input type="hidden" name="action" value="submit"/>
+                            <input type="hidden" value="submitted" name="state"/>
+                            <div class="form-group col-sm-6">
+                                <button class="btn rounded-0 btn-danger" id="deleteBtn" t-if="application and application.state == 'draft'">Delete</button>
+                                <button class="btn btn-info" id="saveBtn" t-if="not application or application.state == 'draft'">Save</button>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <input type="submit" class="btn btn-primary pull-right" value="Next" t-if="not application or application.state == 'draft'"/>
+                            </div>
+                        </div>
+
+                    </form>
+
+                    <div class="mt32" t-if="application and application.state != 'draft'" style="padding: 10px;">
+                        <h4><strong>Message and communication history</strong></h4>
+                        <t t-call="portal.message_thread">
+                            <t t-set="object" t-value="application"/>
+                            <t t-set="token" t-value="application.access_token"/>
+                            <t t-set="pid" t-value="pid"/>
+                            <t t-set="hash" t-value="hash"/>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+
+        <script type="text/javascript">
+        $('#saveBtn').click(function() {
+            console.log('save button clicked');
+            $('input[name="action"]').val('save');
+
+            $('#application-form *').filter(':input').each(function(){
+                $(this).removeAttr('required');
+            });
+
+            $("#application-form").submit();
+        })
+        </script>
+    </template>
+
+    <template id="license_application_technical_form" name="Technical Details">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title" t-if="application and application.state !='draft'">Application Details</t>
+                <t t-set="title" t-else="">Telecommunications License</t>
+            </t>
+
+            <div>
+                <h3 t-if="application and application.state !='draft'">Application Details</h3>
+                <h3 t-else="">Telecommunications License</h3>
+            </div>
+
+            <br/>
+
+            <div>
+                <form action="" method="post" enctype="multipart/form-data" class="form" id="technical-application-form">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                </form>
+            </div>
+        </div>
+    </template>
+
+</odoo>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record model="ir.ui.view" id="license_applications_list">
+    <field name="name">License Applications</field>
+    <field name="model">telecoms.license_application</field>
+    <field name="arch" type="xml">
+      <tree create="false" delete="false">
+        <field name="name" string="#"/>
+        <field name="company_name"/>
+        <field name="license_type"/>
+        <field name="state"/>
+        <field name="create_date"/>
+        <field name="submission_date"/>
+      </tree>
+    </field>
+  </record>
+
+
+  <record model="ir.ui.view" id="license_application_form_view">
+    <field name="name">License Applications</field>
+    <field name="model">telecoms.license_application</field>
+    <field name="arch" type="xml">
+      <form string="Application" create="false" edit="true" delete="false">   
+        <header>
+          <field name="name" invisible="1"/>
+          <field name="state" widget="statusbar"/>
+        </header>       
+                      
+        <sheet>
+          <div class="oe_button_box" name="button_box">
+            <button 
+              name="action_get_attachment_tree_view" 
+              class="oe_stat_button"
+              icon="fa-book"
+              type="object">
+                <field name="attachment_number" widget="statinfo" string="Documents"/>
+            </button>
+          </div>
+
+
+
+            <notebook>
+              <page string="Application Details">
+                <group>
+                  <separator string="License Details"/>
+                  <field name="application_type"/>
+                  <field name="license_type"/>
+                </group>
+
+                <group col="2">
+                  <separator string="Company Details"/>
+                  <field name="company_name"/>
+                  <field name="company_postal_address"/>
+                  <field name="company_physical_address"/>
+                  <field name="company_email"/>
+                  <field name="company_tel"/>
+                  <field name="company_tin"/>
+                </group>
+
+                <group>
+                  <separator string="Contact Person Details"/>
+                  <field name="contact_person_name" string="Name"/> 
+                  <field name="contact_person_email" string="Email"/>
+                  <field name="contact_person_number" string="Phone Number"/>
+                </group>
+
+                
+
+                <notebook>
+                  <page string="Company Directors" >
+                      <field name="company_directors">
+                        <tree string="Company Directors" editable="bottom">
+                          <field name="directors_name"/>   
+                          <field name="directors_citizenship"/>   
+                          <field name="directors_share_holding"/>
+                          <field name="directors_id_number"/>
+                          <field name="directors_id_file"/> 
+                        </tree>
+                      </field>          
+                  </page>
+                </notebook> 
+
+                
+                <notebook>
+                    <page string="Management" >
+                      <field name="key_management_staff">
+                        <tree string="Key Management Staff" editable="bottom">
+                          <field name="staff_name"/>
+                          <field name="job_title"/>
+                          <field name="staff_resume_file"/>
+                        </tree>
+                      </field>
+                    </page>
+                  </notebook>
+
+                <group>
+                  <field name="submission_date" attrs="{'invisible':[('state', '=', 'draft')]}"/>
+                  <field name="applicant"/>
+                </group>
+              </page>
+
+
+
+              <page string="Technical Details">
+
+              </page>
+            </notebook>
+
+          </sheet>
+          
+          <div class="oe_chatter">
+            <field name="message_follower_ids" widget="mail_followers"/>
+            <field name="activity_ids" widget="mail_activity"/>
+            <field name="message_ids" widget="mail_thread"/>
+          </div>
+
+        </form>
+      </field>
+    </record>
+
+  <record model="ir.actions.act_window" id="license_applications_view">
+    <field name="name">License Applications</field>
+    <field name="res_model">telecoms.license_application</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+
+  <menuitem name="Telecommunications" id="telecoms.menu_root"/>
+  <menuitem parent="telecoms.menu_root" id="menu_license_application" action="license_applications_view" sequence="1"/>
+
+</odoo>
