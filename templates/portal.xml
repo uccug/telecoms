@@ -516,7 +516,7 @@
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                 </form>
             </div>
-        </div>
+        </t>
     </template>
 
 </odoo>

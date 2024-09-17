@@ -120,3 +120,124 @@ class LicenseApplication(models.Model):
         attach_data = dict((res['res_id'], res['res_id_count']) for res in read_group_res)
         for record in self:
             record.attachment_number = attach_data.get(record.id, 0)
+
+
+
+class LegalRequirement(models.Model):
+    _name = 'telecoms.legal_requirement'
+    _description = 'Legal Requirement'
+
+    name = fields.Char()
+    description = fields.Text()
+
+
+class LegalReview(models.Model):
+    _name = 'telecoms.legal_review'
+    _description = 'Legal Review'
+
+    assessment_id = fields.Many2one(
+        comodel_name='telecoms.legal_assessment',
+        string='Evaluation Report',
+        ondelete='cascade',
+    )
+
+    requirement = fields.Many2one('telecoms.legal_requirement', string='Requirement')
+    comments = fields.Text()
+    status = fields.Selection([('statisfactory', 'Satisfactory'),('unstatisfactory', 'Unstatisfactory')])
+
+
+class LegalAssessment(models.Model):
+    _name = 'telecoms.legal_assessment'
+    _description = 'Legal Assessment'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
+    name = fields.Char()
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('reviewed', 'Reviewed'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ], default="draft", string='Status')
+
+    application_id = fields.Many2one('telecoms.license_application', string='Application')
+
+    company_name = fields.Char(string='Company', store=True, related='application_id.company_name', readonly=True)
+    company_physical_address = fields.Char(string='Physical Address', store=True, related='application_id.company_physical_address', readonly=True)
+    company_postal_address = fields.Char(string='Postal Address', store=True, related='application_id.company_postal_address', readonly=True)
+    company_tel = fields.Char(string='Tel', store=True, related='application_id.company_tel', readonly=True)
+    company_email = fields.Char(string='Email', store=True, related='application_id.company_email', readonly=True)
+
+    reviews = fields.One2many(
+        string='Reviews', 
+        comodel_name='telecoms.legal_review', inverse_name='assessment_id'
+    )
+
+    conclusion = fields.Text()
+
+    reviewed = fields.Boolean(string='Reviewed')
+    reviewed_by = fields.Many2one('hr.employee', string="Reviewed By")
+    review_comments = fields.Text()
+    reviewed_at = fields.Datetime()
+
+    approved = fields.Boolean(string='Approved')
+    approved_by = fields.Many2one('hr.employee', string="Approved By")
+    approved_at = fields.Datetime()
+
+    rejected = fields.Boolean(string='Rejected')
+    rejected_by = fields.Many2one('hr.employee', string="Rejected By")
+    rejection_comments = fields.Text()
+    rejected_at = fields.Datetime()
+
+    @api.model
+    def create(self, vals):
+        # if vals.get('name', _('New')) == _('New') or vals.get('name') == '':
+        application = self.env['telecoms.license_application'].search([('id', '=', vals.get('application_id'))])
+        vals['name'] = 'Legal/%s' % application.name
+        
+        res = super(LegalAssessment, self).create(vals)
+
+        return res
+
+    @api.onchange('application_id')
+    def onchange_application(self):
+        for rec in self:
+            if rec.application_id:
+                rec.sudo().write({'reviews': [(5,0,0)]})
+                self.generate_requirements()
+
+
+    def generate_requirements(self):
+        self.reviews.unlink()
+        requirements = self.env['telecoms.legal_requirement'].search([])
+        review_values = []
+        for record in self:
+            for requirement in requirements:
+                row = self.env['telecoms.legal_review'].create({
+                    'application_id': record.id,
+                    'requirement': requirement.id,
+                    'status': 'statisfactory'
+                })
+                review_values.append(row.id)
+
+        self.reviews =[(6, 0, review_values)]
+
+    def submit(self):
+        self.state = 'submitted'
+
+    def approve(self):
+        employee = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
+
+        self.state = 'approved'
+        self.approved = True
+        self.approved_by = employee.id,
+        self.approved_at = datetime.datetime.now()
+        
+
+    def reject(self):
+        employee = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
+
+        self.state = 'rejected'
+        self.rejected = True
+        self.rejected_by = employee.id
+        self.rejected_at = datetime.datetime.now()

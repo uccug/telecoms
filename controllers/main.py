@@ -92,8 +92,8 @@ class TelecomsPortalController(CustomerPortal):
                 'directors_share_holding': share_holding,
                 'directors_id_number': id_number,
                 'directors_id_file': request.env['ir.attachment'].sudo().create({
-                    'name': f"{directors_name}'s ID",
-                    'datas_fname': f"{directors_name}'s ID",
+                    'name': "%s's ID" % directors_name,
+                    'datas_fname': "%s's ID" % directors_name,
                     'type': 'binary',
                     'datas': base64.encodestring(id_file.read()),
                     'res_model': 'broadcasting.license_application',
@@ -117,8 +117,8 @@ class TelecomsPortalController(CustomerPortal):
                 'job_title': staff_title,
                 'cv_file_name': cv.filename,
                 'staff_resume_file': request.env['ir.attachment'].sudo().create({
-                    'name': f"{staff_name}'s CV",
-                    'datas_fname': f"{staff_name}'s CV",
+                    'name': "%s's CV" % staff_name,
+                    'datas_fname': "%s's CV" % staff_name,
                     'type': 'binary',
                     'datas': base64.encodestring(cv.read()),
                     'res_model': 'broadcasting.license_application',

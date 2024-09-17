@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="legal_assessment_review_form" model="ir.ui.view">
+         <field name="name">Review Wizard</field>
+         <field name="model">telecoms.legal_assessment.review</field>
+         <field name="arch" type="xml">
+            <form string="Submit Review">
+                <group>
+                    <field name="assessment_id" invisible="1"/>
+                    <field name="review_comments" string="Comments"/>
+                </group>
+                <footer>
+                    <button name="submit" string="Submit" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+         </field>
+     </record>
+
+    <record id="create_legal_assessment_review" model="ir.actions.act_window">
+        <field name="name">Review</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">telecoms.legal_assessment.review</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="legal_assessment_review_form"/>
+        <field name="target">new</field>
+    </record>
+
+
+
+    <record id="legal_assessment_rejection_form" model="ir.ui.view">
+         <field name="name">Rejection Wizard</field>
+         <field name="model">telecoms.legal_assessment.rejection</field>
+         <field name="arch" type="xml">
+            <form string="Recommendation">
+                <group>
+                    <field name="assessment_id" invisible="1"/>
+                    <field name="rejection_comments" string="Reasons for Rejection"/>
+                </group>
+                <footer>
+                    <button name="submit" string="Submit" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+         </field>
+     </record>
+
+    <record id="reject_legal_assessment" model="ir.actions.act_window">
+        <field name="name">Rejection Assessment</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">telecoms.legal_assessment.rejection</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="legal_assessment_rejection_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

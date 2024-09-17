@@ -2,3 +2,8 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_telecoms_license_application,telecoms.license_application,model_telecoms_license_application,,1,1,1,1
 access_telecoms_company_director,telecoms.company_director,model_telecoms_company_director,,1,1,1,1
 access_telecoms_staff,telecoms.staff,model_telecoms_staff,,1,1,1,1
+
+
+access_telecoms_legal_requirement,telecoms.legal_requirement,model_telecoms_legal_requirement,,1,1,1,1
+access_telecoms_legal_review,telecoms.legal_review,model_telecoms_legal_review,,1,1,1,1
+access_telecoms_legal_assessment,telecoms.legal_assessment,model_telecoms_legal_assessment,,1,1,1,1

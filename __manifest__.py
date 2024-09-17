@@ -25,8 +25,9 @@
         # 'wizards/create_billing_advise.xml',
         # 'wizards/assessment_report_recommendation.xml',
         # 'wizards/create_rejection.xml',
-        # 'wizards/certificate.xml',
+        'wizards/legal/views.xml',
         'views/internal.xml',
+        'views/assessments/legal.xml',
         'templates/portal.xml',
         'templates/email.xml',
 

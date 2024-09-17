@@ -126,5 +126,8 @@
 
   <menuitem name="Telecommunications" id="telecoms.menu_root"/>
   <menuitem parent="telecoms.menu_root" id="menu_license_application" action="license_applications_view" sequence="1"/>
+  <menuitem name="Assessments" parent="telecoms.menu_root" id="menu_assessment_reports" sequence="2"/>
+  <menuitem name="Settings" id="telecoms.settings_menu" parent="telecoms.menu_root" sequence="3"/>
+
 
 </odoo>
